@@ -1,22 +1,46 @@
-app.controller('loginController', function($scope) {
-    $scope.message = "Please sign in with Google or use your email and password.";
+app.controller('loginController', function ($scope) {
+    $scope.signInMessage = "Please sign in with your email and password.";
     $scope.isSignedIn = false;
+    $scope.welcomeMessage = "";
+    $scope.form = {};
+    $scope.signedUp = false;
+    $scope.signedOut = false;
+    $scope.signedOutMessage = "";
+    $scope.user = {
+        email: "",
+        password: ""
+    };
+    $scope.invalidCredentials = false;
 
-    $scope.login = function() {
+    const adminCredentials = {
+        email: "admin@test.com",
+        password: "password"
+    }
+
+    $scope.login = function () {
         if ($scope.loginForm.$valid) {
-            $scope.isSignedIn = true;
-            $scope.message = "Welcome, " + $scope.user.email;
+            if ($scope.user.email === adminCredentials.email && $scope.user.password === adminCredentials.password) {
+                $scope.isSignedIn = true;
+                $scope.welcomeMessage = "Welcome back, Admin!";
+                $scope.invalidCredentials = false;
+            } else {
+                $scope.isSignedIn = false;
+                $scope.invalidCredentials = true;
+            }
+
         }
     };
 
-    $scope.signOut = function() {
-        var auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut().then(function () {
-            $scope.$apply(function() {
-                $scope.message = "You have been signed out.";
-                $scope.isSignedIn = false;
-                $scope.user = {};
-            });
-        });
+    $scope.submitInfo = function () {
+        $scope.signedUp = true;
+        const formData = $scope.form;
+        console.log(formData);
+    }
+
+    $scope.signOut = function () {
+        $scope.signedOut = true;
+        $scope.signedOutMessage = "You have been signed out.";
+        $scope.isSignedIn = false;
+        $scope.user = {};
     };
 });

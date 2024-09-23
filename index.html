@@ -1,48 +1,107 @@
 <!DOCTYPE html>
-<html ng-app="myApp">
+<html ng-app="myApp" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>My AngularJS App</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles/main.css">
     <script src="/node_modules/angular/angular.js"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
     <script src="app.js"></script>
     <script src="controllers/loginController.js"></script>
 </head>
-<body>
-<div ng-controller="loginController" id="loginController">
-    <img src="images/logo.png" alt="App Logo" class="logo">
-    <h1>{{ message }}</h1>
-    <div ng-show="!isSignedIn">
-        <form name="loginForm" ng-submit="login()">
-            <input type="email" ng-model="user.email" placeholder="Email" required>
-            <input type="password" ng-model="user.password" placeholder="Password" required ng-pattern="/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/">
-            <span ng-show="loginForm.password.$error.pattern">Password must be at least 8 characters long and contain at least one letter and one number.</span>
-            <button type="submit">Sign In</button>
-        </form>
-        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+<body ng-controller="loginController" id="loginController">
+<nav class="navbar navbar-expand-md bg-black border-body mb-5" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Newsletter Signup</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="ms-auto" ng-show="isSignedIn">
+                <button class="btn btn-primary" ng-click="signOut()">Sign Out</button>
+            </div>
+        </div>
     </div>
-    <div ng-show="isSignedIn">
-        <button ng-click="signOut()">Sign Out</button>
+</nav>
+<div class="container">
+    <div class="container" ng-show="!isSignedIn && !signedOut">
+        <form class="align-content-center border shadow p-3 mb-5 bg-body rounded" name="loginForm" ng-submit="login()">
+            <div ng-show="loginForm.$dirty && invalidCredentials">
+                <div class="alert alert-danger" role="alert">
+                    Invalid email or password. Please try again
+                </div>
+            </div>
+            <h5>{{ signInMessage }}</h5>
+            <div class="mb-3">
+                <input class="form-control" id="emailTextBox" type="email" ng-model="user.email" placeholder="Email"
+                       required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control" type="password" ng-model="user.password" placeholder="Password" required>
+            </div>
+            <div class="d-flex justify-content-end align-items-end">
+                <button class="btn btn-primary ms-2" type="submit">Sign In</button>
+            </div>
+        </form>
+    </div>
+    <div class="container" ng-show="isSignedIn">
+        <h5>{{welcomeMessage}}</h5>
+        <div ng-show="signedUp">
+            <p>
+                Thank you for signing up for our Newsletter, an email has been sent to confirm your subscription.
+            </p>
+        </div>
+        <form class="align-content-center border shadow p-3 mb-5 bg-body rounded" name="submitFormData" ng-submit="submitInfo()" ng-show="!signedUp">
+            <p>
+                Please provide your US information below to sign up for our newsletter.
+            </p>
+            <div class="mb-3">
+                <label for="firstNameTextBox" class="form-label">First Name</label>
+                <input class="form-control" id="firstNameTextBox" type="text" ng-model="submitForm.firstName" required ng-maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label for="lastNameTextBox" class="form-label">Last Name</label>
+                <input class="form-control" id="lastNameTextBox" type="text" ng-model="submitForm.lastName" required ng-maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label for="address1textBox" class="form-label">Address 1</label>
+                <input class="form-control" id="address1textBox" type="text" ng-model="submitForm.address1" required ng-maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label for="address2TextBox" class="form-label">Address 2</label>
+                <input class="form-control" id="address2TextBox" type="text" ng-model="submitForm.address2" required ng-maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label for="cityTextBox" class="form-label">City</label>
+                <input class="form-control" id="cityTextBox" type="text" ng-model="submitForm.city" required ng-maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label for="stateTextBox" class="form-label">State</label>
+                <input class="form-control" id="stateTextBox" type="text" ng-model="submitForm.state" required ng-maxlength="30">
+            </div>
+            <div class="mb-3">
+                <label for="zipTextBox" class="form-label">Zip Code</label>
+                <input class="form-control" id="zipTextBox" type="text" ng-model="submitForm.zip" placeholder="Zip Code" required ng-pattern="/^\d{5}$/" >
+            </div>
+            <div class="mb-3 form-check">
+                <input class="form-check-input" type="checkbox" ng-model="submitForm.permission" id="permissionCheckBox">
+                <label class="form-check-label" for="permissionCheckBox">
+                    Include an emailed copy of the newsletter
+                </label>
+            </div>
+            <div class="d-flex justify-content-end align-items-end">
+                <button class="btn btn-primary ms-2" type="submit">Sign up</button>
+            </div>
+        </form>
+    </div>
+    <div class="container text-center" ng-show="signedOut">
+        <h5>{{signedOutMessage}}</h5>
+        <div>
+            <button class="btn btn-primary ms-2" ng-click="signedOut = false">Sign in again</button>
+        </div>
     </div>
 </div>
-<script>
-    function onSignIn(googleUser) {
-        var profile = googleUser.getBasicProfile();
-        angular.element(document.getElementById('loginController')).scope().$apply(function (scope) {
-            scope.user = {
-                id: profile.getId(),
-                name: profile.getName(),
-                imageUrl: profile.getImageUrl(),
-                email: profile.getEmail()
-            };
-            scope.isSignedIn = true;
-            scope.message = "Hello, " + scope.user.name;
-        });
-    }
-</script>
 </body>
 </html>
